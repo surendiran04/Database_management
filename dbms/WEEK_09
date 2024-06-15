@@ -1,0 +1,266 @@
+CREATE TABLE PRODUCT (                                                                                                                             
+  2  PID INT NOT NULL,                                                                                                                                  
+  3  DESCRIPTION VARCHAR(20),                                                                                                                           
+  4  PRICE INT,                                                                                                                                         
+  5  STOCK INT,                                                                                                                                         
+  6  PRIMARY KEY(PID));                                                                                                                                 
+
+
+Table created. 
+
+CREATE TABLE PURCHASE(                                                                                                                             
+  2   PUR_ID INT NOT NULL,                                                                                                                              
+  3   PID INT NOT NULL,                                                                                                                                 
+  4   QUANTITY INT,                                                                                                                                     
+  5   SUPPLIER_NAME VARCHAR(15),                                                                                                                        
+  6  PRIMARY KEY(PUR_ID),                                                                                                                               
+  7  FOREIGN KEY(PID) REFERENCES PRODUCT(PID));                                                                                                         
+                                                                                                                                                        
+Table created.                                                                                                                                          
+                 
+ SQL> CREATE TABLE SALES(                                                                                                                                
+  2  SALESID INT NOT NULL,                                                                                                                              
+  3  PID INT NOT NULL,                                                                                                                                  
+  4  QUANTITY INT,                                                                                                                                      
+  5  CUSTOMER_NAME VARCHAR(15),                                                                                                                         
+  6  PRIMARY KEY(SALESID),                                                                                                                              
+  7  FOREIGN KEY(PID) REFERENCES PRODUCT(PID));                                                                                                         
+
+
+Table created. 
+
+      SELECT * FROM PRODUCT;                                                                                                                             
+                                                                                                                                                        
+       PID DESCRIPTION               PRICE      STOCK                                                                                                   
+---------- -------------------- ---------- ----------                                                                                                   
+         1 TASTY                        50         10                                                                                                   
+         2 GOOD AROMA                   60         15                                                                                                   
+         3 GOOD SMELL                   45         10                                                                                                   
+         4 YUMMY                        55          5                                                                                                   
+         5 HEALTHY                      60          8
+ 
+ SELECT * FROM PURCHASE;                                                                                                                            
+                                                                                                                                                        
+    PUR_ID        PID   QUANTITY SUPPLIER_NAME                                                                                                          
+---------- ---------- ---------- ---------------                                                                                                        
+         1          1          5 danny                                                                                                                  
+         2          4          8 jack                                                                                                                   
+         3          3          8 RAM                                                                                                                    
+         4          4         10 DANNY                                                                                                                  
+         5          2          2 TOM   
+         
+    SELECT * FROM SALES;                                                                                                                               
+                                                                                                                                                        
+   SALESID        PID   QUANTITY CUSTOMER_NAME                                                                                                          
+---------- ---------- ---------- ---------------                                                                                                        
+       101          1          1 ROSHAN                                                                                                                 
+       102          3          5 SANDY                                                                                                                  
+       103          2          2 VIRAT                                                                                                                  
+       105          5          1 ROHIT                                                                                                                  
+       104          3          1 DHONI                                                                                                                  
+            
+  ****3.Retrieve the ids of the products that are either sold or purchased.**** 
+                                                                                                                          
+  SELECT PID FROM PRODUCT P WHERE PID IN ((SELECT PID FROM SALES WHERE PID=P.PID) UNION (SELECT PID FROM PURCHASE WHERE PID=P.PID));     
+                                                         (OR)
+  SELECT PID,STOCK FROM PRODUCT P WHERE P.PID IN (SELECT PID FROM PURCHASE WHERE P.PID=PID) OR P.PID IN (SELECT PID FROM SALES WHERE P.PID=PID);     
+                                                                                                                                                                                                                                                                                                                                                                                               
+       PID                                                                                                                                              
+----------                                                                                                                                              
+         1                                                                                                                                              
+         2                                                                                                                                              
+         3                                                                                                                                              
+         4                                                                                                                                              
+         5 
+         
+   ******4.Retrieve the id and stock of the products that are purchased but not sold. Display the details in decreasing order of stock.*****
+   
+SELECT PID,STOCK FROM PRODUCT P WHERE P.PID IN (SELECT PID FROM PURCHASE WHERE P.PID=PID) AND P.PID NOT IN (SELECT PID FROM SALES WHERE P.PID=PID) ORDER BY STOCK;
+
+       PID      STOCK                                                                                                                                   
+---------- ----------                                                                                                                                   
+         4          5 
+        
+        ****5.Define a trigger TS to update the Product.Stock whenever any addition of record(s) is (are) performed on Sales****
+
+ CREATE OR REPLACE TRIGGER TS                                                                                                                       
+ AFTER INSERT ON SALES                                                                                                                              
+ FOR EACH ROW                                                                                                                                       
+BEGIN                                                                                                                                              
+   UPDATE PRODUCT SET STOCK=STOCK-:NEW.QUANTITY WHERE PID=:NEW.PID;                                                                                  END;                                                                                                                                               
+ /                                                                                                                                                  
+                                                                                                                                                        
+Trigger created.                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM PRODUCT;                                                                                                                             
+                                                                                                                                                        
+       PID DESCRIPTION               PRICE      STOCK                                                                                                   
+---------- -------------------- ---------- ----------                                                                                                   
+         1 TASTY                        50         10                                                                                                   
+         2 GOOD AROMA                   60         15                                                                                                   
+         3 GOOD SMELL                   45         10                                                                                                   
+         4 YUMMY                        55          5                                                                                                   
+         5 HEALTHY                      60          8                                                                                                   
+                                                                                                                                                        
+SQL> INSERT INTO SALES VALUES(106,5,5,'SOM');                                                                                                           
+                                                                                                                                                        
+1 row created.                                                                                                                                          
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM PRODUCT;                                                                                                                             
+                                                                                                                                                        
+       PID DESCRIPTION               PRICE      STOCK                                                                                                   
+---------- -------------------- ---------- ----------                                                                                                   
+         1 TASTY                        50         10                                                                                                   
+         2 GOOD AROMA                   60         15                                                                                                   
+         3 GOOD SMELL                   45         10                                                                                                   
+         4 YUMMY                        55          5                                                                                                   
+         5 HEALTHY                      60          13    
+         
+         
+    ***UPDATE TRIGGER*****     
+  CREATE OR REPLACE TRIGGER TS1                                                                                                                      
+  BEFORE UPDATE ON SALES                                                                                                                             
+  FOR EACH ROW                                                                                                                                       
+  BEGIN                                                                                                                                              
+      UPDATE PRODUCT SET STOCK=STOCK-:OLD.QUANTITY WHERE PID=:OLD.PID;                                                                                 
+      UPDATE PRODUCT SET STOCK=STOCK+:NEW.QUANTITY WHERE PID=:NEW.PID;                                                                                 
+ END;                                                                                                                                               
+    /                                                                                                                                                  
+                                                                                                                                                        
+Trigger created.                                                                                                                                        
+                                                                                                                                                                                                                                                        
+****DELETE TRIGGER*****
+CREATE OR REPLACE TRIGGER TS2                                                                                                                      
+ BEFORE DELETE ON SALES                                                                                                                             
+  FOR EACH ROW                                                                                                                                       
+  BEGIN                                                                                                                                              
+     UPDATE PRODUCT SET STOCK=STOCK-:OLD.QUANTITY WHERE PID=:OLD.PID;                                                                                 
+   END;                                                                                                                                               
+  /                                                                                                                                                  
+                                                                                                                                                        
+Trigger created.                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                        
+****6.Define a trigger TP to update the Product.Stock whenever any modification is performed on
+Purchase.Quantity****
+ CREATE OR REPLACE TRIGGER Tp                                                                                                                       
+ AFTER INSERT ON purchase                                                                                                                           
+ FOR EACH ROW                                                                                                                                       
+BEGIN                                                                                                                                              
+   UPDATE PRODUCT SET STOCK=STOCK-:NEW.QUANTITY WHERE PID=:NEW.PID;                                                                                  END;                                                                                                                                               
+ /                                                                                                                                                                                                                                                                                                                                                                                                                        
+         
+       *****7.view*****  
+ create view show1 as                                                                                                                               
+  2  select p.pid,salesid,customer_name,supplier_name from sales s join purchase p on p.pid=s.pid;                                                      
+                                                                                                                                                       
+View created. 
+select * from show1;                                                                                                                               
+                                                                                                                                                        
+       PID    SALESID CUSTOMER_NAME   SUPPLIER_NAME                                                                                                     
+---------- ---------- --------------- ---------------                                                                                                   
+         1        104 DHONI           danny                                                                                                             
+         1        102 SANDY           danny                                                                                                             
+         2        103 VIRAT           TOM                                                                                                               
+         2        101 ROSHAN          TOM                                                                                                               
+         5        106 SOM             ss                                                                                                                
+         5        105 ROHIT           ss                                                                                                                
+                                                                                                                                                        
+6 rows selected. 
+
+8.retrieve with autotrace*****
+select pid from product;                                                                                                                           
+                                                                                                                                                        
+       PID                                                                                                                                              
+----------                                                                                                                                              
+         1                                                                                                                                              
+         2                                                                                                                                              
+         3                                                                                                                                              
+         4                                                                                                                                              
+         5                                                                                                                                              
+                                                                                                                                                        
+                                                                                                                                                        
+Execution Plan                                                                                                                                          
+----------------------------------------------------------                                                                                              
+                                                                                                                                                        
+--------------------------------------------------------------------------------------                                                                  
+| Id  | Operation            | Name          | Rows  | Bytes | Cost (%CPU)| Time     |                                                                  
+--------------------------------------------------------------------------------------                                                                  
+|   0 | SELECT STATEMENT     |               |     5 |    65 |     2   (0)| 00:00:01 |                                                                  
+|   1 |  INDEX FAST FULL SCAN| SYS_C00116603 |     5 |    65 |     2   (0)| 00:00:01 |                                                                  
+--------------------------------------------------------------------------------------                                                                                                                                                                                                         
+   
+   ****9
+   create or replace function getstock1                                                                                                               
+    return int                                                                                                                                         
+    is                                                                                                                                                 
+    id int;                                                                                                                                            
+    VAR int;                                                                                                                                         
+    begin                                                                                                                                              
+     id:=&pid;                                                                                                                                         
+     select stock into VAR from product where pid=id; 
+  return VAR;                                                                                              
+    end;                                                                                                                                               
+ 10  /                                                                                                                                                  
+Enter value for pid: 1                                                                                                                                  
+old   7:  id:=&pid;                                                                                                                                     
+new   7:  id:=1;                                                                                                                                                                                                                                                                                                                                                                                                                                       
+     
+      ****10.PROCEDURE
+  CREATE PROCEDURE  P                                                                                                                                
+  2  IS                                                                                                                                                 
+  3  BEGIN                                                                                                                                              
+  4   FOR VAL IN (SELECT PID,DESCRIPTION,STOCK FROM PRODUCT) LOOP                                                                                       
+  5     DBMS_OUTPUT.PUT_LINE(VAL.PID || VAL.DESCRIPTION || VAL.STOCK);                                                                                  
+  6   END LOOP;                                                                                                                                         
+  7  END;                                                                                                                                               
+  8  /                                                                                                                                                  
+
+
+Procedure created.                                                                                                                                      
+                                                                                                                                                        
+SQL> EXEC P;  
+
+1TASTY4                                                                                                                                                 
+2GOOD AROMA15                                                                                                                                           
+3GOOD SMELL16                                                                                                                                           
+4YUMMY5                                                                                                                                                 
+5HEALTHY2                                                                                                                                               
+                                                                                                                                                        
+PL/SQL procedure successfully completed.                                                                                                                
+                                                                                                                                                        
+    
+    SET AUTOTRACE ON;                                                                                                                                  
+SP2-0618: Cannot find the Session Identifier.  Check PLUSTRACE role is enabled                                                                          
+SP2-0611: Error enabling STATISTICS report                                                                                                              
+SQL> SELECT * FROM PURCHASE;                                                                                                                            
+                                                                                                                                                        
+    PUR_ID        PID   QUANTITY SUPPLIER_NAME                                                                                                          
+---------- ---------- ---------- ---------------                                                                                                        
+         1          1          5 danny                                                                                                                  
+         2          4          8 jack                                                                                                                   
+         3          3          8 RAM                                                                                                                    
+         4          4         10 DANNY                                                                                                                  
+         5          2          2 TOM                                                                                                                    
+         6          5          1 ss                                                                                                                     
+                                                                                                                                                        
+6 rows selected.                                                                                                                                        
+                                                                                                                                                        
+                                                                                                                                                        
+Execution Plan                                                                                                                                          
+----------------------------------------------------------                                                                                              
+Plan hash value: 2913724801                                                                                                                             
+                                                                                                                                                        
+------------------------------------------------------------------------------                                                                          
+| Id  | Operation         | Name     | Rows  | Bytes | Cost (%CPU)| Time     |                                                                          
+------------------------------------------------------------------------------                                                                          
+|   0 | SELECT STATEMENT  |          |     6 |   288 |     3   (0)| 00:00:01 |                                                                          
+|   1 |  TABLE ACCESS FULL| PURCHASE |     6 |   288 |     3   (0)| 00:00:01 |                                                                          
+------------------------------------------------------------------------------                                                                          
+                                                                                                                                                        
+Note                                                                                                                                                    
+-----                                                                                                                                                   
+   - dynamic sampling used for this statement (level=2)                                                                                                 
+                                                                                                                                                        
+SQL>                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

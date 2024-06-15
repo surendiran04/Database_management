@@ -1,0 +1,199 @@
+*****adding constraints******
+SQL> ALTER TABLE ITEM MODIFY QUANTITY INT CHECK(QUANTITY>0);                                                                                            
+                                                                                                                                                        
+Table altered.                                                                                                                                          
+                                                                                                                                                        
+SQL> INSERT INTO ITEM VALUES (6,'SOAP',25,0,'1-SEP-2024');                                                                                              
+INSERT INTO ITEM VALUES (6,'SOAP',25,0,'1-SEP-2024')                                                                                                    
+*                                                                                                                                                       
+ERROR at line 1:                                                                                                                                        
+ORA-02290: check constraint (S2022103560.SYS_C00106826) violated                                                                                        
+                                                                                                                                                        
+                                                                                                                                                        
+SQL> INSERT INTO ITEM VALUES (6,'SOAP',25,1,'1-SEP-2024');                                                                                              
+                                                                                                                                                        
+1 row created.                                                                                                                                          
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM ITEM;                                                                                                                                
+                                                                                                                                                        
+   ITEM_ID ITEM_NAME             RATE   QUANTITY EXPIRY_DA                                                                                              
+---------- --------------- ---------- ---------- ---------                                                                                              
+         1 LAYS                    20         10 25-MAY-24                                                                                              
+         2 UNIBIC BISCUITS         30          5 20-JUN-24                                                                                              
+         3 5-STAR                  60          2 14-AUG-24                                                                                              
+         4 MAGGIE                  48          5 01-SEP-24                                                                                              
+         5 SOFT DRINK              15         18 05-OCT-24                                                                                              
+         6 SOAP                    25          1 01-SEP-24                                                                                              
+                                                                                                                                                        
+6 rows selected. 
+
+****adding foreign key**********  
+SQL> ALTER TABLE BILL ADD FOREIGN KEY(ITEM_ID) REFERENCES ITEM(ITEM_ID);                                                                                
+                                                                                                                                                        
+Table altered.                                                                                                                                          
+                                                                                                                                                        
+SQL> INSERT INTO BILL VALUES (3,5,1,10);                                                                                                                
+INSERT INTO BILL VALUES (3,5,1,10)                                                                                                                      
+*                                                                                                                                                       
+ERROR at line 1:                                                                                                                                        
+ORA-02291: integrity constraint (S2022103560.SYS_C00107133) violated - parent key not found                                                             
+                                                                                                                                                        
+                                                                                                                                                        
+SQL> INSERT INTO BILL VALUES (3,4,1,48);                                                                                                                
+                                                                                                                                                        
+1 row created.    
+
+***rATE DEDUCTANCE ACC TO EXPIRY DATE*************
+SQL> SELECT * FROM ITEM;                                                                                                                                
+                                                                                                                                                        
+   ITEM_ID ITEM_NAME             RATE   QUANTITY EXPIRY_DA                                                                                              
+---------- --------------- ---------- ---------- ---------                                                                                              
+         5 ASPIRIN                 15          2 10-MAR-24                                                                                              
+         1 LAYS                    20         10 25-MAY-24                                                                                              
+         2 BISCUITS                30          5 20-JUN-24                                                                                              
+         3 5-STAR                  60          2 14-AUG-24                                                                                              
+         4 MAGGIE                  48          5 01-SEP-24                                                                                              
+         6 SOAP                    25          1 01-SEP-24                                                                                              
+         7 DOLO                    15          4 05-OCT-24                                                                                              
+         8 PARACETAMOL            5.1          2 20-OCT-24                                                                                              
+                                                                                                                                                        
+8 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> UPDATE ITEM SET RATE=RATE-RATE*0.01 WHERE EXPIRY_DATE<'15-MAR-2024';                                                                               
+                                                                                                                                                        
+1 row updated.                                                                                                                                          
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM ITEM;                                                                                                                                
+                                                                                                                                                        
+   ITEM_ID ITEM_NAME             RATE   QUANTITY EXPIRY_DA                                                                                              
+---------- --------------- ---------- ---------- ---------                                                                                              
+         5 ASPIRIN              14.85          2 10-MAR-24                                                                                              
+         1 LAYS                    20         10 25-MAY-24                                                                                              
+         2 BISCUITS                30          5 20-JUN-24                                                                                              
+         3 5-STAR                  60          2 14-AUG-24                                                                                              
+         4 MAGGIE                  48          5 01-SEP-24                                                                                              
+         6 SOAP                    25          1 01-SEP-24                                                                                              
+         7 DOLO                    15          4 05-OCT-24                                                                                              
+         8 PARACETAMOL            5.1          2 20-OCT-24                                                                                              
+                                                                                                                                                        
+8 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> 
+
+****display the date between *****
+SELECT ITEM_ID,QUANTITY,EXPIRY_DATE FROM ITEM;                                                                                                     
+                                                                                                                                                        
+   ITEM_ID   QUANTITY EXPIRY_DA                                                                                                                         
+---------- ---------- ---------                                                                                                                         
+         1         10 25-MAY-24                                                                                                                         
+         2          5 20-JUN-24                                                                                                                         
+         3          2 14-AUG-24                                                                                                                         
+         4          5 01-SEP-24                                                                                                                         
+         6          1 01-SEP-24                                                                                                                         
+         7          4 05-OCT-24                                                                                                                         
+         8          2 20-OCT-24                                                                                                                         
+                                                                                                                                                        
+7 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT ITEM_ID,QUANTITY,EXPIRY_DATE FROM ITEM WHERE EXPIRY_DATE BETWEEN '1-JUN-2024' AND '30-SEP-2024';                                            
+                                                                                                                                                        
+   ITEM_ID   QUANTITY EXPIRY_DA                                                                                                                         
+---------- ---------- ---------                                                                                                                         
+         2          5 20-JUN-24                                                                                                                         
+         3          2 14-AUG-24                                                                                                                         
+         4          5 01-SEP-24                                                                                                                         
+         6          1 01-SEP-24     
+         
+****total bill******
+SQL> SELECT B_NO,SUM(PRICE) AS TOTAL_BILL FROM BILL GROUP BY B_NO;                                                                                      
+                                                                                                                                                        
+      B_NO TOTAL_BILL                                                                                                                                   
+---------- ----------                                                                                                                                   
+         1        130                                                                                                                                   
+         2        233                                                                                                                                   
+         3         48                 
+         
+****renaming*****
+UPDATE ITEM SET ITEM_NAME='BISCUITS' WHERE ITEM_NAME LIKE 'UN%';                                                                                   
+                                                                                                                                                        
+1 row updated.                                                                                                                                          
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM BILL;                                                                                                                                
+                                                                                                                                                        
+      B_NO    ITEM_ID   QUANTITY      PRICE                                                                                                             
+---------- ---------- ---------- ----------                                                                                                             
+         1          1          2         40                                                                                                             
+         1          2          3         90                                                                                                             
+         2          3          3        180                                                                                                             
+         2          4          1         48                                                                                                             
+         2          8          1          5                                                                                                             
+         3          4          1         48                                                                                                             
+                                                                                                                                                        
+6 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM ITEM;                                                                                                                                
+                                                                                                                                                        
+   ITEM_ID ITEM_NAME             RATE   QUANTITY EXPIRY_DA                                                                                              
+---------- --------------- ---------- ---------- ---------                                                                                              
+         1 LAYS                    20         10 25-MAY-24                                                                                              
+         2 BISCUITS                30          5 20-JUN-24                                                                                              
+         3 5-STAR                  60          2 14-AUG-24                                                                                              
+         4 MAGGIE                  48          5 01-SEP-24                                                                                              
+         6 SOAP                    25          1 01-SEP-24                                                                                              
+         7 DOLO                    15          4 05-OCT-24                                                                                              
+         8 PARACETAMOL            5.1          2 20-OCT-24                                                                                              
+                                                                                                                                                        
+7 rows selected.                                                                                                                                        
+                                                                                                                  
+         
+ **** find the difference between the expiry date and today****
+ SELECT months_between(expiry_date,sysdate) as difference from item;                                                                                
+                                                                                                                                                        
+DIFFERENCE                                                                                                                                              
+----------                                                                                                                                              
+2.88189815                                                                                                                                              
+3.72060783                                                                                                                                              
+5.52705944                                                                                                                                              
+ 6.1077046                                                                                                                                              
+ 6.1077046                                                                                                                                              
+7.23673686                                                                                                                                              
+7.72060783                                                                                                                                              
+                                                                                                                                                        
+7 rows selected.         
+
+****DIFFERNCE FROM EXPIRY DATE************
+                                                                                                                                                        
+SQL> SELECT SYSDATE-EXPIRY_DATE AS MONTH_DIFFERENCE FROM DUAL,ITEM;                                                                                     
+                                                                                                                                                        
+MONTH_DIFFERENCE                                                                                                                                        
+----------------                                                                                                                                        
+      -79.433924                                                                                                                                        
+      -105.43392                                                                                                                                        
+      -160.43392                                                                                                                                        
+      -178.43392                                                                                                                                        
+      -178.43392                                                                                                                                        
+      -212.43392                                                                                                                                        
+      -227.43392                                                                                                                                        
+                                                                                                                                                                                                                                                                                       
+                       
+ **** average rate of products*****
+ select avg(rate) from item;                                                                                                                        
+                                                                                                                                                        
+ AVG(RATE)                                                                                                                                              
+----------                                                                                                                                              
+29.0142857     
+
+***MAXIMUM****
+select max(rate) AS MAX from item ;
+
+                                                                                                                                                        
+SQL> select MIN(rate) AS MIN from item ;                                                                                                                
+    
+    ***MIN****                                                                                                                                                    
+       MIN                                                                                                                                              
+----------                                                                                                                                              
+       5.1                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                   

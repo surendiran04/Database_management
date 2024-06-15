@@ -1,0 +1,186 @@
+                                                                                                                                                                                                                                                                                     
+SQL> SELECT * FROM EMPLOYEE;                                                                                                                            
+                                                                                                                                                        
+FNAME           LNAME                M        SSN BDATE     ADDRESS                        S     SALARY  SUPER_SSN       D_NO EMP_AGE                   
+--------------- -------------------- - ---------- --------- ------------------------------ - ---------- ---------- ---------- ---------                 
+SURENDIRAN      MURUGESAN            M  987654321 25-OCT-04 5/31A,ANNA NAGAR,CHENNAI       M     100000  987654320          2                           
+RAM             KUMAR                N  987698021 05-FEB-14 5/3B,ADYAR,CHENNAI             M      10000  987654322          1                           
+
+SQL> SELECT * FROM DEPARTMENT;                                                                                                                          
+                                                                                                                                                        
+D_NAME                          D_NO    MGR_SSN MGR_START TOTAL_SALARY                                                                                  
+------------------------- ---------- ---------- --------- ------------                                                                                  
+COMPUTER SSCIENCE                  1   12345678 21-FEB-24        10000                                                                                  
+INFORMATION TECHNOLOGY             2   13579246 22-FEB-24       100000      
+
+SQL> CREATE TRIGGER T2  AFTER INSERT ON EMPLOYEE                                                                                                        
+  2  FOR EACH ROW                                                                                                                                       
+  3  ENABLE                                                                                                                                             
+  4  DECLARE                                                                                                                                            
+  5   OLD_SALARY NUMBER;                                                                                                                                
+  6  BEGIN                                                                                                                                              
+  7     SELECT TOTAL_SALARY INTO OLD_SALARY FROM DEPARTMENT WHERE D_NO=:NEW.D_NO;                                                                       
+  8     UPDATE DEPARTMENT SET TOTAL_SALARY=OLD_SALARY+:NEW.SALARY WHERE D_NO=:NEW.D_NO;                                                                 
+  9  END;                                                                                                                                               
+ 10  / 
+ Trigger created.                                                                            
+ 
+ SQL> INSERT INTO EMPLOYEE VALUES ('TOM','HENRY','T',23456,'8-MAR-04','USA','M',20000,9876,1,'15-DEC-2022');                                             
+                                                                                                                                                        
+1 row created.      
+
+SQL> SELECT * FROM DEPARTMENT;                                                                                                                          
+                                                                                                                                                        
+D_NAME                          D_NO    MGR_SSN MGR_START TOTAL_SALARY                                                                                  
+------------------------- ---------- ---------- --------- ------------                                                                                  
+COMPUTER SSCIENCE                  1   12345678 21-FEB-24        30000                                                                                  
+INFORMATION TECHNOLOGY             2   13579246 22-FEB-24       100000     
+
+ ***** QUERY TO COPY THE EXISTING DATA INTO A NEW TABLE USING SELECT STATEMENT********
+ 
+SQL> CREATE TABLE BOAT_COUNT AS (SELECT DAY,COUNT(DAY) AS BOATS_COUNT FROM RESERVES GROUP BY DAY);                                                      
+                                                                                                                                                        
+Table created.                                                                                                                                          
+                                                                                                                                                        
+SQL> SELECT * FROM BOAT_COUNT;                                                                                                                          
+                                                                                                                                                        
+DAY       BOATS_COUNT                                                                                                                                   
+--------- -----------                                                                                                                                   
+15-MAR-24           1                                                                                                                                   
+26-MAR-24           1                                                                                                                                   
+08-MAR-24           1                                                                                                                                   
+01-APR-24           1                                                                                                                                   
+01-MAR-24           4                                                                                                                                   
+02-MAR-24           1                                                                                                                                   
+14-MAR-24           1                                                                                                                                   
+13-MAR-24           1                                                                                                                                   
+27-MAR-24           2                                                                                                                                   
+                                                                                                                                                        
+9 rows selected.                                                                                                                                        
+
+ 
+ QL> SELECT * FROM DAY_WISE_COUNT;                                                                                                                      
+
+
+DAY       NO_OF_BOATS_RESERVED                                                                                                                          
+--------- --------------------                                                                                                                          
+18-MAR-24                    1                                                                                                                          
+01-APR-24                    2                                                                                                                          
+01-MAR-24                    2                                                                                                                          
+02-MAR-24                    1                                                                                                                          
+14-MAR-24                    1                                                                                                                          
+15-MAR-24                    1                                                                                                                          
+                                                                                                                                                        
+6 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM RESERVES;                                                                                                                            
+                                                                                                                                                        
+       SID        BID DAY                                                                                                                               
+---------- ---------- ---------                                                                                                                         
+         1        102 08-MAR-24                                                                                                                         
+         1        105 15-MAR-24                                                                                                                         
+         4        101 13-MAR-24                                                                                                                         
+         3        102 14-MAR-24                                                                                                                         
+         5        104 01-APR-24                                                                                                                         
+         2        101 01-MAR-24                                                                                                                         
+         1        101 01-MAR-24                                                                                                                         
+         1        104 01-MAR-24                                                                                                                         
+         1        103 02-MAR-24                                                                                                                         
+                                                                                                                                                        
+9 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> CREATE TRIGGER COUNT_TRIGGER AFTER INSERT ON RESERVES                                                                                              
+  2  FOR EACH ROW                                                                                                                                       
+  3  ENABLE                                                                                                                                             
+  4  DECLARE                                                                                                                                            
+  5   OLD_COUNT NUMBER;                                                                                                                                 
+  6  BEGIN                                                                                                                                              
+  7     SELECT NO_OF_BOATS_RESERVED INTO OLD_COUNT FROM DAY_WISE_COUNT WHERE DAY=:NEW.DAY;                                                              
+  8     UPDATE DAY_WISE_COUNT SET NO_OF_BOATS_RESERVED=OLD_COUNT+1 WHERE DAY=:NEW.DAY;                                                                  
+  9  END;                                                                                                                                               
+ 10  /                                                                                                                                                  
+                                                                                                                                                        
+Trigger created.  
+
+SQL> INSERT INTO RESERVES VALUES (3,101,'1-MAR-24');                                                                                                    
+                                                                                                                                                        
+1 row created.                                                                                                                                          
+                                                                                                                                                        
+SQL> SELECT * FROM DAY_WISE_COUNT;                                                                                                                      
+                                                                                                                                                        
+DAY       NO_OF_BOATS_RESERVED                                                                                                                          
+--------- --------------------                                                                                                                          
+18-MAR-24                    1                                                                                                                          
+01-APR-24                    2                                                                                                                          
+01-MAR-24                    3                                                                                                                          
+02-MAR-24                    1                                                                                                                          
+14-MAR-24                    1                                                                                                                          
+15-MAR-24                    1                                                                                                                          
+                                                                                                                                                        
+6 rows selected.
+
+SQL> CREATE TRIGGER NEW_TRIGGER AFTER INSERT ON RESERVES                                                                                                
+  2  FOR EACH ROW                                                                                                                                       
+  3  ENABLE                                                                                                                                             
+  4  BEGIN                                                                                                                                              
+  5     INSERT INTO DAY_WISE_COUNT VALUES(:NEW.DAY,1);                                                                                                  
+  6  END;                                                                                                                                               
+  7  /                                                                                                                                                  
+                                                                                                                                                        
+Trigger created. 
+                                                                                                                                                                                                                                                                             
+                                                                                                                                                        
+SQL> INSERT INTO RESERVES VALUES (6,104,'13-MAR-24');                                                                                                   
+                                                                                                                                                        
+1 row created.                                                                                                                                          
+                                                                                                                                                        
+SQL> SELECT * FROM DAY_WISE_COUNT;                                                                                                                      
+                                                                                                                                                        
+DAY       NO_OF_BOATS_RESERVED                                                                                                                          
+--------- --------------------                                                                                                                          
+18-MAR-24                    1                                                                                                                          
+01-APR-24                    2                                                                                                                          
+01-MAR-24                    3                                                                                                                          
+02-MAR-24                    1                                                                                                                          
+14-MAR-24                    1                                                                                                                          
+15-MAR-24                    1                                                                                                                          
+13-MAR-24                    1                                                                                                                         
+                                                                                                                                                        
+7 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL>
+
+SQL> CREATE TRIGGER DELETE_TRIGGER AFTER DELETE ON RESERVES                                                                                             
+  2  FOR EACH ROW                                                                                                                                       
+  3  ENABLE                                                                                                                                             
+  4  DECLARE                                                                                                                                            
+  5    OLD_COUNT NUMBER;                                                                                                                                
+  6  BEGIN                                                                                                                                              
+  7     SELECT NO_OF_BOATS_RESERVED INTO OLD_COUNT FROM DAY_WISE_COUNT WHERE DAY=:OLD.DAY;                                                              
+  8     UPDATE DAY_WISE_COUNT SET NO_OF_BOATS_RESERVED=OLD_COUNT-1 WHERE DAY=:OLD.DAY;                                                                  
+  9  END;                                                                                                                                               
+ 10  /                                                                                                                                                  
+                                                                                                                                                        
+Trigger created.                                                                                                                                        
+                                                                                                                                                        
+SQL> DELETE FROM RESERVES WHERE DAY='29-MAR-2024';                                                                                                      
+                                                                                                                                                        
+1 row deleted.                                                                                                                                          
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM DAY_WISE_COUNT;                                                                                                                      
+                                                                                                                                                        
+DAY       NO_OF_BOATS_RESERVED                                                                                                                          
+--------- --------------------                                                                                                                          
+18-MAR-24                    1                                                                                                                          
+01-APR-24                    2                                                                                                                          
+01-MAR-24                    3                                                                                                                          
+02-MAR-24                    1                                                                                                                          
+14-MAR-24                    1                                                                                                                          
+15-MAR-24                    1                                                                                                                          
+27-MAR-24                    4                                                                                                                          
+26-MAR-24                    2                                                                                                                          
+29-MAR-24                    0                                                                                                                          
+          
+          
+

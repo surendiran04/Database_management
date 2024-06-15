@@ -1,0 +1,101 @@
+DECLARE                                                                                                                                    
+  2     EID PAYSLIP.EID%TYPE;                                                                                                                   
+  3     SAL PAYSLIP.SALARY%TYPE;                                                                                                                
+  4     TAX REAL;                                                                                                                               
+  5     CURSOR S IS SELECT EID, NET FROM SALARY;                                                                                                
+  6  BEGIN                                                                                                                                      
+  7     OPEN S;                                                                                                                                 
+  8     LOOP                                                                                                                                    
+  9             FETCH S INTO EID, SAL;                                                                                                          
+ 10             SAL := SAL * 12;                                                                                                                
+ 11             IF(SAL < 500000) THEN TAX := SAL*0.15;                                                                                          
+ 12             ELSIF(SAL > 500000) THEN TAX := SAL*0.20;                                                                                       
+ 13             END IF;                                                                                                                         
+ 14             EXIT WHEN S%NOTFOUND;                                                                                                           
+ 15             INSERT INTO PAYSLIP VALUES(EID, SAL, TAX);                                                                                      
+ 16     END LOOP;                                                                                                                               
+ 17  END;                                                                                                                                       
+ 18  /                                                                                                                                          
+                                                                                                                                                
+PL/SQL procedure successfully completed.                                                                                                        
+                                                                                                                                                
+Commit complete.                                                                                                                                
+SQL> SELECT * FROM PAYSLIP;                                                                                                                     
+                                                                                                                                                
+       EID     SALARY        TAX                                                                                                                
+---------- ---------- ----------                                                                                                                
+         1     600000     120000                                                                                                                
+         2     600000     120000                                                                                                                
+         3     660000     132000                                                                                                                
+         4     780000     156000                                                                                                                
+         5     900000     180000                                                                                                                
+         6    1020000     204000                                                                                                                
+
+#1
+SQL> CREATE OR REPLACE PROCEDURE MA                                                                                                              
+2  IS                                                                                                                                         
+3     M NUMBER;                                                                                                                               
+4     A NUMBER;                                                                                                                               
+5  BEGIN                                                                                                                                      
+6     SELECT MAX(NET) INTO M FROM SALARY;                                                                                                     
+7     SELECT AVG(NET) INTO A FROM SALARY;                                                                                                     
+8     DBMS_OUTPUT.PUT_LINE('MAX = ' || M);                                                                                                    
+9     DBMS_OUTPUT.PUT_LINE('AVG = ' || A);                                                                                                    
+10  END;                                                                                                                                       
+11  /                                                                                                                                          
+
+ Procedure created.                                                                                                                              
+
+
+                                                                                                                                                
+                                                                                                                                              
+SQL> EXECUTE MA;                                                                                                                                
+MAX = 85000                                                                                                                                     
+AVG = 63333.3333333333333333333333333333333333                                                                                                  
+                                                                                                                                               
+                                                                                                                                                
+PL/SQL procedure successfully completed.                                                                                                        
+
+
+
+
+#2
+SQL> CREATE OR REPLACE PROCEDURE DES                                                                                                            
+2  IS                                                                                                                                         
+3     EEID NUMBER := &EID;                                                                                                                    
+4     DESG VARCHAR(30);                                                                                                                       
+5  BEGIN                                                                                                                                      
+6     SELECT DESG INTO DESG FROM EMPLOYEE_W7 WHERE EMPLOYEE_W7.EID = EEID;                                                                    
+7     DBMS_OUTPUT.PUT_LINE(DESG);                                                                                                             
+8  END;                                                                                                                                       
+9  /                                                                                                                                          
+
+Enter value for eid: 1                                                                                                                          
+old   3:        EEID NUMBER := &EID;                                                                                                            
+new   3:        EEID NUMBER := 1;                                                                                                               
+                                                                                                                                                
+                                                                                                                                                
+Procedure created.                                                                                                                              
+
+
+
+SQL> EXECUTE DES;                                                                                                                               
+ZZZ                                                                                                                                             
+                                                                                                                                              
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+#3
+SQL> CREATE OR REPLACE PROCEDURE C                                                                                                              
+2  IS                                                                                                                                         
+3     CO NUMBER;                                                                                                                              
+4  BEGIN                                                                                                                                      
+5     SELECT COUNT(EID) INTO CO FROM EMPLOYEE_W7;                                                                                             
+6     DBMS_OUTPUT.PUT_LINE(CO);                                                                                                               
+7  END;                                                                                                                                       
+8  /                                                                                                                                          
+
+
+Procedure created.                                                                                                                              
+
+SQL> EXECUTE C;                                                                                                                                 

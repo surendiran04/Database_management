@@ -1,0 +1,221 @@
+****WEEK-11*****
+SELECT * FROM BILL;                                                                                                                                
+                                                                                                                                                        
+      B_NO    ITEM_ID   QUANTITY      PRICE                                                                                                             
+---------- ---------- ---------- ----------                                                                                                             
+         1          1          2         40                                                                                                             
+         1          2          3         90                                                                                                             
+         2          3          3        180                                                                                                             
+         2          4          1         48                                                                                                             
+         3          4          1         48                                                                                                             
+                                                                                                                                                        
+SQL> ALTER TABLE BILL DROP COLUMN PRICE;                                                                                                                
+
+
+Table altered.                                                                                                                                          
+                                                                                                                                                        
+SQL> ALTER TABLE BILL ADD PRICE DECIMAL(10,2);                                                                                                          
+                                                                                                                                                        
+Table altered.                                                                                                                                          
+                                                                                                                                                        
+SQL> SELECT * FROM BILL;                                                                                                                                
+                                                                                                                                                        
+      B_NO    ITEM_ID   QUANTITY      PRICE                                                                                                             
+---------- ---------- ---------- ----------                                                                                                             
+         1          1          2                                                                                                                        
+         1          2          3                                                                                                                        
+         2          3          3                                                                                                                        
+         2          4          1                                                                                                                        
+         3          4          1                                                                                                                        
+  
+  ****1.2.CREATED AND POPULATED 3 TABLES*****
+ SELECT * FROM ITEM;                                                                                                                                
+                                                                                                                                                        
+   ITEM_ID ITEM_NAME             RATE   QUANTITY SAFE_STOCK                                                                                             
+---------- --------------- ---------- ---------- ----------                                                                                             
+         5 ASPIRIN              14.85          2          0                                                                                             
+         1 LAYS                    20         10          8                                                                                             
+         2 BISCUITS                30          5         15                                                                                             
+         3 5-STAR                  60          2          1                                                                                             
+         4 MAGGIE                  48          5          3                                                                                             
+         6 SOAP                    25          1          0                                                                                             
+                                                                                                                                                        
+6 rows selected.  
+
+SELECT * FROM BILL;                                                                                                                                
+                                                                                                                                                        
+      B_NO    ITEM_ID   QUANTITY      PRICE                                                                                                             
+---------- ---------- ---------- ----------                                                                                                             
+         1          1          2                                                                                                                        
+         1          2          3                                                                                                                        
+         2          3          3                                                                                                                        
+         2          4          1                                                                                                                        
+         3          4          1                                                                                                                        
+                                                                                                                                                                                                                                                                                              
+                                                                                                                                                        
+   SQL> CREATE TABLE TOTAL_SALES(                                                                                                                          
+  2  B_NO INT NOT NULL,                                                                                                                                 
+  3  TOTAL_PRICE DECIMAL(10,2));                                                                                                                        
+                                                                                                                                                        
+Table created.                                                                                                                                          
+                                                                                                                                                        
+******3.DISPLAY THE ITEM_ID,QUANTITY,SAFE_STOCK FROM ITEM TABLE*****
+ELECT ITEM_ID,QUANTITY,SAFE_STOCK FROM ITEM;                                                                                                      
+                                                                                                                                                        
+   ITEM_ID   QUANTITY SAFE_STOCK                                                                                                                        
+---------- ---------- ----------                                                                                                                        
+         5          2          0                                                                                                                        
+         1         10          8                                                                                                                        
+         2          5         15                                                                                                                        
+         3          2          1                                                                                                                        
+         4          5          3                                                                                                                        
+         6          1          0                                                                                                                        
+                                                                                                                                                        
+6 rows selected.  
+                                                                                                                                      
+****4.PROCEDURE TO UPDATE THE PRICE****
+                                                                                                                                                         
+CREATE OR REPLACE PROCEDURE COMPUTE_PRICE(BI_NO IN INT,I_ID IN INT)
+                                                                                                                       IS                                                                                                                                                 
+                                                                                                                                 
+ R NUMBER;
+ Q NUMBER;  
+ BEGIN 
+     
+           SELECT RATE INTO R FROM ITEM WHERE ITEM_ID=I_ID;
+           SELECT QUANTITY INTO Q FROM BILL WHERE B_NO=BI_NO AND ITEM_ID=I_ID;
+                                                                                                                                              
+  UPDATE BILL SET PRICE=R*Q WHERE B_NO=BI_NO AND ITEM_ID=I_ID;
+   DBMS_OUTPUT.PUT_LINE('PRICE UPDATED');                                                                                                             
+ END;                                                                                                                                               
+   
+   EXEC COMPUTE_PRICE(1,2);                                                                                                                           
+PRICE UPDATED                                                                                                                                           
+                                                                                                                                                        
+PL/SQL procedure successfully completed.                                                                                                                
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM BILL;                                                                                                                                
+                                                                                                                                                        
+      B_NO    ITEM_ID   QUANTITY      PRICE                                                                                                             
+---------- ---------- ---------- ----------                                                                                                             
+         1          1          2         40                                                                                                             
+         1          2          3         90                                                                                                             
+         2          3          3                                                                                                                        
+         2          4          1                                                                                                                        
+         3          4          1                                                                                                                        
+   
+   *****5.TOTAL PRICE IN BILL TABLE****
+   create or replace function TOTAL_PRICE                                                                                                             
+  RETURN INT                                                                                                                                         
+   IS                                                                                                                                                 
+   NUM INT;                                                                                                                                           
+    BEGIN                                                                                                                                              
+      SELECT SUM(PRICE) INTO NUM FROM BILL ;                                                                                              
+     RETURN NUM;                                                                                                                                      
+   END;                                                                                                                                               
+    / 
+    
+    SELECT TOTAL_PRICE FROM DUAL;                                                                                                                      
+                                                                                                                                                        
+TOTAL_PRICE                                                                                                                                             
+-----------                                                                                                                                             
+        130                                                                                                                                             
+                                                                                                                                                                                                                                                                                                         
+    *****6.QUANTITY LESSER THAN SAFE_STOCK ****                                                                                                
+CREATE OR REPLACE TRIGGER QUANTITY_UPDATE                                                                                                         
+BEFORE INSERT OR UPDATE ON BILL                                                                                                                   
+FOR EACH ROW  
+DECLARE
+SQ NUMBER;
+NQ NUMBER;
+                                                                                                                                                                                                                                                                                                                                              
+BEGIN   
+   SELECT SAFE_STOCK INTO SQ FROM ITEM WHERE ITEM_ID=:NEW.ITEM_ID;                                                                   
+   SELECT QUANTITY INTO NQ FROM ITEM WHERE ITEM_ID=:NEW.ITEM_ID;
+  IF (NQ-:NEW.QUANTITY<SQ) THEN
+    DBMS_OUTPUT.PUT_LINE('QUANTITY LESSER THAN SAFE_STOCK ALERT');
+  END IF;
+                                                                                                                                        
+END;
+/
+
+SELECT * FROM ITEM;                                                                                                                                
+                                                                                                                                                        
+   ITEM_ID ITEM_NAME             RATE   QUANTITY SAFE_STOCK                                                                                             
+---------- --------------- ---------- ---------- ----------                                                                                             
+         5 ASPIRIN              14.85          2          0                                                                                             
+         1 LAYS                    20         10          8                                                                                             
+         2 BISCUITS                30          5         15                                                                                             
+         3 5-STAR                  60          2          1                                                                                             
+         4 MAGGIE                  48          5          3                                                                                             
+         6 SOAP                    25          1          0                                                                                             
+                                                                                                                                                        
+6 rows selected.                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM BILL;                                                                                                                                
+                                                                                                                                                        
+      B_NO    ITEM_ID   QUANTITY      PRICE                                                                                                             
+---------- ---------- ---------- ----------                                                                                                             
+         1          1          2         40                                                                                                             
+         1          2          3         90                                                                                                             
+         2          3          3                                                                                                                        
+         2          4          1                                                                                                                        
+         3          4          1                                                                                                                        
+                                                                                                                                                        
+SQL> INSERT INTO BILL VALUES(4,4,3,144);                                                                                                                
+QUANTITY LESSER THAN SAFE_STOCK ALERT
+                                                                                                                                                        
+1 row created.                                                                                                                                          
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+
+
+  *****7.ITEM THAT IS PURCHASED MORE THAN ONCE IN THE BILL TABLE******
+  SELECT ITEM_NAME FROM ITEM WHERE ITEM_ID IN (SELECT ITEM_ID FROM BILL HAVING COUNT(ITEM_ID)>1 GROUP BY ITEM_ID);                                   
+                                                                                                                                                        
+ITEM_NAME                                                                                                                                               
+---------------                                                                                                                                         
+MAGGIE                                                                                                                                                  
+   
+  
+
+***8.
+CREATE OR REPLACE PROCEDURE COMPUTE_TOTALAMOUNT                                                                                                   
+IS   
+P NUMBER;                                                                                                                       
+BEGIN                                                                                                                                              
+   FOR B IN (SELECT B_NO,,PRICE FROM BILL) LOOP 
+       SELECT SUM(PRICE) INTO P FROM BILL WHERE GROUP BY BID;              
+       INSERT INTO TOTAL_SALES VALUES(B.B_NO,P);
+    END LOOP;
+ END; 
+ 
+ 
+ 8) Populate the Total_Sales table from Bill table using any suitable concept of your DB developer.                                      
+                                                                                                                                        
+        CREATE OR REPLACE TRIGGER T_TOTAL BEFORE INSERT OR UPDATE ON BILL_WK11                                                          
+        FOR EACH ROW ENABLE                                                                                                             
+        DECLARE                                                                                                                         
+                TEMP REAL; TEMP1 INT;                                                                                                   
+        BEGIN                                                                                                                           
+                SELECT COUNT(*) INTO TEMP1 FROM TOTAL_SALES_WK11 WHERE BILL_NO=:NEW.BILL_NO;                                            
+                SELECT TOTAL_PRICE INTO TEMP FROM TOTAL_SALES_WK11 WHERE BILL_NO=:NEW.BILL_NO;                                          
+                IF TEMP1 = 0 THEN                                                                                                       
+                        INSERT INTO TOTAL_SALES_WK11 VALUES(:NEW.BILL_NO,:NEW.PRICE);                                                   
+                ELSE                                                                                                                    
+                 UPDATE TOTAL_SALES_WK11 SET TOTAL_PRICE=TEMP-:OLD.PRICE+:NEW.PRICE WHERE BILL_NO = :NEW.BILL_NO;                       
+                END IF;                                                                                                                 
+        END;                                                                                                                            
+        /                                                                                                                               
+
+
+9) Display the discount amount (discount : 2% of bill amount) of a bill if the price-amount of the bill exceeds Rs.1000                 
+                                                                                                                                        
+        SELECT BILL_NO,SUM(PRICE)*0.02 AS DISCOUNT FROM BILL_WK11 GROUP BY(BILL_NO) HAVING SUM(PRICE) > 1000;                           
+                                                                                                                                        
+10) Display the item names of the bills, for the bills that have total amount greater than 750.                                         
+                                                                                                                                        
+        SELECT ITEM_ID FROM BILL_WK11 GROUP BY(ITEM_ID) HAVING SUM(PRICE) > 750;                                                        
+                                                                                     
+                                                                                                                                                                                                                                                                                 
