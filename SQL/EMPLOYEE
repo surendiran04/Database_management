@@ -1,0 +1,105 @@
+                                                                                                                                                        
+SQL> ALTER TABLE EMPLOYEE RENAME COLUMN AGE TO EMP_AGE;                                                                                                 
+                                                                                                                                                        
+Table altered.                                                                                                                                          
+                                                                                                                                                        
+SQL> SELECT * FROM EMPLOYEE;                                                                                                                            
+                                                                                                                                                        
+FNAME           LNAME                M        SSN BDATE     ADDRESS                        S    SALARAY  SUPER_SSN       D_NO EMP_AGE                   
+--------------- -------------------- - ---------- --------- ------------------------------ - ---------- ---------- ---------- ---------                 
+SURENDIRAN      MURUGESAN            M  987654321 25-OCT-04 5/31A,ANNA NAGAR,CHENNAI       M     100000  987654320          2                           
+RAM             KUMAR                N  987698021 05-FEB-14 5/3B,ADYAR,CHENNAI             M      10000  987654322                                      
+                                                                                                                                                        
+SQL> CREATE TABLE EMP_ADDRESS(SSN INT,FNAME VARCHAR(20),LNAME VARCHAR(20),ADDRESS VARCHAR(30));                                                         
+                                                                                                                                                        
+Table created.                                                                                                                                          
+                                                                                                                                                                                                                                                                            
+                                                                                                                                                        
+                                                                                                                                                                                                                                                                       
+
+                                                                                                                                                        
+SQL> INSERT INTO EMP_ADDRESS VALUES SELECT(FNAME,LNAME,SSN,ADDRESS) FROM EMPLOYEE;                                                                      
+INSERT INTO EMP_ADDRESS VALUES SELECT(FNAME,LNAME,SSN,ADDRESS) FROM EMPLOYEE                                                                            
+                               *
+ERROR at line 1:                                                                                                                                        
+ORA-00936: missing expression                                                                                                                           
+                                                                                                                                                        
+                                                                                                                                                        
+SQL> INSERT INTO EMP_ADDRESS VALUES AS (SSN,FNAME,LNAME,ADDRESS) SELECT(FNAME,LNAME,SSN,ADDRESS) FROM EMPLOYEE;                                         
+INSERT INTO EMP_ADDRESS VALUES AS (SSN,FNAME,LNAME,ADDRESS) SELECT(FNAME,LNAME,SSN,ADDRESS) FROM EMPLOYEE                                               
+                               *
+ERROR at line 1:                                                                                                                                        
+ORA-00936: missing expression                                                                                                                           
+                                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM DEPARTMENT;                                                                                                                          
+                                                                                                                                                        
+D_NAME                          D_NO    MGR_SSN MGR_START                                                                                               
+------------------------- ---------- ---------- ---------                                                                                               
+COMPUTER SSCIENCE                  1   12345678 21-FEB-24                                                                                               
+INFORMATION TECHNOLOGY             2   13579246 22-FEB-24                                                                                               
+                                                                                                                                                        
+SQL> SELECT * FROM DEPEDENT;                                                                                                                            
+SELECT * FROM DEPEDENT                                                                                                                                  
+              *                                                                                                                                         
+ERROR at line 1:                                                                                                                                        
+ORA-00942: table or view does not exist                                                                                                                 
+                                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM DEPENDENT;                                                                                                                           
+                                                                                                                                                        
+      ESSN DEPENDENT_NAME       SEX   B_DATE    RELATIONSH                                                                                              
+---------- -------------------- ----- --------- ----------                                                                                              
+      1234 ADITHYA              MALE  21-AUG-04 FRIEND                                                                                                  
+      1204 SHAKITH              MALE  07-JAN-05 FRIEND                                                                                                  
+                                                                                                                                                        
+SQL> SELECT FNAME,SSN,SALARY FROM EMPLOYEE WHERE D_NO=2;                                                                                                
+SELECT FNAME,SSN,SALARY FROM EMPLOYEE WHERE D_NO=2                                                                                                      
+                 *                                                                                                                                      
+ERROR at line 1:                                                                                                                                        
+ORA-00904: "SALARY": invalid identifier                                                                                                                 
+                                                                                                                                                        
+                                                                                                                                                        
+SQL> SELECT FNAME,SSN,SALARAY FROM EMPLOYEE WHERE D_NO=2;                                                                                               
+                                                                                                                                                        
+FNAME                  SSN    SALARAY                                                                                                                   
+--------------- ---------- ----------                                                                                                                   
+SURENDIRAN       987654321     100000                                                                                                                   
+                                                                                                                                                        
+SQL> SELECT FNAME,SSN,SALARAY,D_NO FROM EMPLOYEE WHERE SALARAY>50000;                                                                                   
+                                                                                                                                                        
+FNAME                  SSN    SALARAY       D_NO                                                                                                        
+--------------- ---------- ---------- ----------                                                                                                        
+SURENDIRAN       987654321     100000          2                                                                                                        
+                                                                                                                                                        
+SQL> SELECT * FROM PROJECT;                                                                                                                             
+                                                                                                                                                        
+P_NAME                P_NO P_LOCATION                      D_NO                                                                                         
+--------------- ---------- ------------------------- ----------                                                                                         
+DATABASE              1230 FLORIDA,USA                        1                                                                                         
+COLLEGE WEBSITE        989 CAPE TOWN,SOUTH AFRICA            10                                                                                         
+                                                                                                                                                        
+SQL> SELECT P_NO,P_NAME FROM PROJECT WHERE D_NO=1;                                                                                                      
+                                                                                                                                                        
+      P_NO P_NAME                                                                                                                                       
+---------- ---------------                                                                                                                              
+      1230 DATABASE                                                                                                                                     
+                                                                                                                                                        
+                                                                                                                       
+                                                                                                                                                       
+                                                                                                                                                        
+SQL> INSERT INTO EMP_ADDRESS SELECT SSN,FNAME,LNAME,ADDRESS FROM EMPLOYEE;                                                                              
+                                                                                                                                                        
+2 rows created.                                                                                                                                         
+                                                                                                                                                        
+Commit complete.                                                                                                                                        
+SQL> SELECT * FROM EMP_ADDRESS;                                                                                                                         
+                                                                                                                                                        
+       SSN FNAME                LNAME                ADDRESS                                                                                            
+---------- -------------------- -------------------- ------------------------------                                                                     
+ 987654321 SURENDIRAN           MURUGESAN            5/31A,ANNA NAGAR,CHENNAI                                                                           
+ 987698021 RAM                  KUMAR                5/3B,ADYAR,CHENNAI                                                                                 
+                                                                                                                                                        
+SQL> 
+
+ 
